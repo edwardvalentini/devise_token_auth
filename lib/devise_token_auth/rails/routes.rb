@@ -45,13 +45,13 @@ module ActionDispatch::Routing
 
         devise_scope resource.underscore.to_sym do
           # path to verify token validity
-          get "#{full_path}/validate_token", controller: "#{token_validations_ctrl}", action: "validate_token"
+          get "#{full_path}/validate_token", controller: "#{token_validations_ctrl}", action: "validate_token", constraints: {format: /(json)/}
 
           # omniauth routes. only define if omniauth is installed and not skipped.
           if defined?(::OmniAuth) and not opts[:skip].include?(:omniauth_callbacks)
-            match "#{full_path}/failure",             controller: omniauth_ctrl, action: "omniauth_failure", via: [:get]
-            match "#{full_path}/:provider/callback",  controller: omniauth_ctrl, action: "omniauth_success", via: [:get]
-            match "#{DeviseTokenAuth.omniauth_prefix}/:provider/callback",  controller: omniauth_ctrl, action: "redirect_callbacks", via: [:get]
+            match "#{full_path}/failure",             controller: omniauth_ctrl, action: "omniauth_failure", via: [:get], constraints: {format: /(json)/}
+            match "#{full_path}/:provider/callback",  controller: omniauth_ctrl, action: "omniauth_success", via: [:get], constraints: {format: /(json)/}
+            match "#{DeviseTokenAuth.omniauth_prefix}/:provider/callback",  controller: omniauth_ctrl, action: "redirect_callbacks", via: [:get], constraints: {format: /(json)/}
             # preserve the resource class thru oauth authentication by setting name of
             # resource as "resource_class" param
             match "#{full_path}/:provider", to: redirect{|params, request|
