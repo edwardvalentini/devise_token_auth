@@ -20,7 +20,7 @@ module DeviseTokenAuth
 
     def omniauth_success
       # find or create user by provider and provider uid
-      @resource = resource_class.where({
+      @resource = callback_resource_class.where({
         uid:      auth_hash['uid'],
         provider: auth_hash['provider']
       }).first_or_initialize
@@ -57,7 +57,7 @@ module DeviseTokenAuth
       extra_params = whitelisted_params
       @resource.assign_attributes(extra_params) if extra_params
 
-      if resource_class.devise_modules.include?(:confirmable)
+      if callback_resource_class.devise_modules.include?(:confirmable)
         # don't send confirmation email!!!
         @resource.skip_confirmation!
       end
@@ -67,6 +67,7 @@ module DeviseTokenAuth
       @resource.save!
 
       # render user info to javascript postMessage communication window
+      # This also needs to be a json message... not html
       render :layout => "layouts/omniauth_response", :template => "devise_token_auth/omniauth_success"
     end
 
@@ -84,6 +85,7 @@ module DeviseTokenAuth
 
     def omniauth_failure
       @error = params[:message]
+      # This also needs to be a json message... not html
       render :layout => "layouts/omniauth_response", :template => "devise_token_auth/omniauth_failure"
     end
 
@@ -102,14 +104,15 @@ module DeviseTokenAuth
     end
 
     # pull resource class from omniauth return
-    def resource_class
+    # this cannot be called resource_class as it conflicts with the resource class in ApplicationController
+    def callback_resource_class
       if omniauth_params
         omniauth_params['resource_class'].constantize
       end
     end
 
     def resource_name
-      resource_class
+      callback_resource_class
     end
 
     # this will be determined differently depending on the action that calls
