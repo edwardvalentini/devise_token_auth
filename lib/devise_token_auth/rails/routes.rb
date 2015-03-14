@@ -51,7 +51,7 @@ module ActionDispatch::Routing
           if defined?(::OmniAuth) and not opts[:skip].include?(:omniauth_callbacks)
             match "#{full_path}/failure",             controller: omniauth_ctrl, action: "omniauth_failure", via: [:get], constraints: {format: :json}
             match "#{full_path}/:provider/callback",  controller: omniauth_ctrl, action: "omniauth_success", via: [:get], constraints: {format: :json}
-            match "#{DeviseTokenAuth.omniauth_prefix}/:provider/callback",  controller: omniauth_ctrl, action: "redirect_callbacks", via: [:get], constraints: {format: :json}
+            match "#{DeviseTokenAuth.omniauth_prefix}/:provider/callback",  controller: omniauth_ctrl, action: "redirect_callbacks", via: [:get,:post], constraints: {format: :json}
             # preserve the resource class thru oauth authentication by setting name of
             # resource as "resource_class" param
             match "#{full_path}/:provider", to: redirect{|params, request|
